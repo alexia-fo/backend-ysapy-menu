@@ -6,7 +6,7 @@ const {Producto} = require('./../../models/producto');
 
 const getMenuWeekly = async (req, res)=>{
     try {
-        const {total, cabeceras} = await Promise.all([
+        const [total, cabeceras] = await Promise.all([
             CMenuSemanal.count(),
             CMenuSemanal.findAll({
                 //todo: falta obtener por between

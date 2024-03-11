@@ -24,7 +24,7 @@ const CMenuSemanal = db.define('CMenuSemanal', {
         allowNull:false
     }
 }, {
-    tablaName: 'cmenusemanal',
+    tableName: 'cmenusemanal',
     createdAt: true,
     updatedAt: true
 });
