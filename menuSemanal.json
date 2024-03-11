@@ -1,0 +1,35 @@
+[
+    menu1: {
+        idcabeceramenu,
+        nrosemana,
+        nrodia,
+        observacion,
+        productos:[
+            {
+                idproducto,
+                item,
+                observacion
+            }
+        ]
+    },
+
+    menu2: {
+        idcabeceramenu,
+        nrosemana,
+        nrodia,
+        observacion,
+        productos:[
+            {
+                idproducto,
+                item,
+                observacion
+            },
+
+            {
+                idproducto,
+                item,
+                observacion
+            }
+        ]
+    }
+]

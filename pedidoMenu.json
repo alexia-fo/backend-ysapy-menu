@@ -1,0 +1,19 @@
+{
+    fechaAlta,
+    idusuario,
+    productos:[
+        {
+            item,
+            idproducto,
+            idcabeceramenu,
+            cantidad
+        },
+
+        {
+            item,
+            idproducto,
+            idcabeceramenu,
+            cantidad
+        }
+    ]
+}
