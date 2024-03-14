@@ -3,35 +3,27 @@
 const CMenuSemanal = require("../../models/cMenuSemanal");
 const DMenuSemanal = require("../../models/dMenuSemanal")
 
-const getDetailMenuWeekly = async(req, res)=>{
-    const {limit, offset} = req.params;
-
+const getMenuWeekly = async (req, res)=>{
     try {
-        
-        const {total, detalle} = Promise.all([
-            DMenuSemanal.count({
-                limit,
-                offset
+        const [total, cabeceras] = await Promise.all([
+            CMenuSemanal.count(),
+            CMenuSemanal.findAll({
+                //todo: falta obtener por between
             }),
-            DMenuSemanal.findAll({
-                limit,
-                offset,
-                include:[
-                    {
-                        model:CMenuSemanal
-                    }
-                ]
-            })
-        ])
+        ]);
 
+        res.status(200).json({
+            total,
+            cabeceras
+        })
     } catch (e) {
         res.status(500).json({
-            msg:'Error durante la obtencion del listado de menu',
-            e
+            msg:'Ha ocurrido un error durante la obtencion de datos',
+            error:e.message
         })
     }
 }
 
 module.exports={
-    getDetailMenuWeekly
+    getMenuWeekly
 }

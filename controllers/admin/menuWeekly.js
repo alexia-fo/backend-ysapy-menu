@@ -1,9 +1,9 @@
 const CMenuSemanal = require('../../models/cMenuSemanal');
 const DMenuSemanal = require('../../models/dMenuSemanal');
 const db = require('./../../db/connection');
-const {Producto} = require('./../../models/producto');
+const Producto = require('../../models/producto');
 
-
+//todo: hecho la primera prueba
 const getMenuWeekly = async (req, res)=>{
     try {
         const [total, cabeceras] = await Promise.all([
@@ -25,50 +25,63 @@ const getMenuWeekly = async (req, res)=>{
     }
 }
 
+//hecho la primera prueba
 const postMenuWeekly = async (req, res)=>{
     const {menu} = req.body;
     const {nrosemana, nrodia, observacion, productos} = menu;
     let t;
     let item=0;
+    let fechaAlta = new Date();
 
     try{
-        t = db.transaction();
+        t = await db.transaction();
 
+        console.log('antes de consultar la cabecera')
         await CMenuSemanal.create({
             nrosemana,
             nrodia,
-            observacion
-        });
-
-        let idcabeceramenu = bd.query('SELECT LAST_INSERT_ID() as lastId',{
-            type: bd.queryTypes.SELECT,
+            observacion,
+            fechaAlta
+        }, {
             transaction: t
         });
 
-        console.log(idcabeceramenu);
+        console.log('despues de consultar la cabecera')
 
+
+        let idcabeceramenu = 1;
+        let result = await db.query('SELECT LAST_INSERT_ID() as lastId',{
+            type: db.QueryTypes.SELECT,
+            transaction: t
+        });
+
+        idcabeceramenu = result[0].lastId;
+
+        console.log('despues de consultar el id de la cabecera')
         try{
-            
-            data = productos.map(async (producto)=>{
-                const {idproducto, observacion} = producto;
-                item++;
 
-                const existsProduct = await Producto.findByPk(idproducto);
+            const data = await Promise.all(
+                productos.map(async (producto)=>{
+                    const {idproducto, observacion} = producto;
+                    item++;
+                    
+                    const prod= await Producto.findByPk(idproducto);
 
+                    if(!prod){
+                        throw new Error(`El producto con id ${idproducto} no existe`);
+                    }
+                    
+                    return {
+                        idcabeceramenu,
+                        idproducto,
+                        item,
+                        observacion
+                    };
+                })
+            );
+            console.log(data);
 
-                if(!existsProduct){
-                    throw new Error(`El producto con id ${idproducto} no existe`);
-                }
-
-                return {
-                    idcabeceramenu,
-                    idproducto,
-                    item,
-                    observacion
-                };
-            });
-
-            await DMenuSemanal.bulkCreate(await Promise(data),{
+            await DMenuSemanal.bulkCreate(await Promise.all(data),{
                 transaction:t
             });
             
@@ -80,11 +93,10 @@ const postMenuWeekly = async (req, res)=>{
         }catch(e){
             t.rollback();
             res.status(500).json({
-                msg:`Error durante el proceso ${e.message}`
-            })
-        }
+                msg:`Error durante el proceso. ${e.message}`
+            });
+      }
 
-        await D
     }catch(e){
         t.rollback();
         res.status(500).json({
@@ -92,23 +104,29 @@ const postMenuWeekly = async (req, res)=>{
             error:e.message
         })
     }
-
 }
 
+//hecho la primera prueba
 const deleteDetailMenu = async (req, res)=>{
     const {idDetail} = req.params;
+    console.log('Ejecutando Delete');
 
     try {
 
         const producto = await DMenuSemanal.findByPk(idDetail);
+        console.log(producto)
 
         await producto.update({
-            estado: !estado
+            estado: !producto.estado
         });
+
+        res.status(200).json({
+            msg: 'Detalle anulado/habilitado correctamente'
+        })
         
     } catch (e) {
         res.status(500).json({
-            msg:'Error al eliminar el producto',
+            msg:'Error al anular/habilitar el detalle de menú',
             error:e.message
         })
     }
@@ -116,6 +134,7 @@ const deleteDetailMenu = async (req, res)=>{
 
 const putDetailMenu = async (req, res)=>{
     const {idproducto, observacion} = req.body;
+    const {idDetail} = req.params;
 
     try {
         const producto = await DMenuSemanal.findByPk(idDetail);
@@ -123,6 +142,10 @@ const putDetailMenu = async (req, res)=>{
         producto.update({
             idproducto,
             observacion
+        });
+
+        res.status(200).json({
+            msg:'Detalle de menú actualizado correctamente'
         })
     } catch (e) {
         res.status(500).json({

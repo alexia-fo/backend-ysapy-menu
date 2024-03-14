@@ -1,7 +1,7 @@
 const {Router} = require('express');
-const { getDetailMenuWeekly } = require('../../controllers/client/menuWeekly');
+const { getMenuWeekly } = require('../../controllers/client/menuWeekly');
 const router = Router();
 
-router.get('/', getDetailMenuWeekly);
+router.get('/', getMenuWeekly);
 
 module.exports=router;
