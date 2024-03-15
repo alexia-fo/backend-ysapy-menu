@@ -2,6 +2,7 @@ const express = require('express');
 const fileupload = require('express-fileupload');
 const path = require('path');
 const db = require('../db/connection')
+const cors = require('cors');
 
 class Server {
     constructor(){
@@ -29,6 +30,7 @@ class Server {
     }
 
     middlewares(){
+        this.app.use(cors());
         this.app.use(express.json());
         this.app.use(express.static(path.join(__dirname, '../public')));
         this.app.use(fileupload({
