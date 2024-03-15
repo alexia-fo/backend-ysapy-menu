@@ -15,7 +15,8 @@ class Server {
         }
 
         this.dbConnection();
-        this.middlewares();
+        this.middlewares();  
+        
         this.pages();
         this.routes();
     }
