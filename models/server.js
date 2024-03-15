@@ -12,6 +12,8 @@ class Server {
         this.paths={
             menuWeeklyAdmin: '/menu/admin/menuWeekly',
             menuWeeklyClient: '/menu/client/menuWeekly',
+            productsAdmin: '/menu/admin/products',
+
         }
 
         this.dbConnection();
@@ -45,6 +47,7 @@ class Server {
         console.log('routes')
         this.app.use(this.paths.menuWeeklyAdmin, require('../routes/admin/menuWeekly'))
         this.app.use(this.paths.menuWeeklyClient, require('../routes/client/menuWeekly'))
+        this.app.use(this.paths.productsAdmin, require('./../routes/admin/products'));
     }
 
     pages(){//FIXME: PARA JS

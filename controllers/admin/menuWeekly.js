@@ -28,6 +28,8 @@ const getMenuWeekly = async (req, res)=>{
 //hecho la primera prueba
 const postMenuWeekly = async (req, res)=>{
     const {menu} = req.body;
+    //todo:falta modificar el nro de semana y numero de dia se calculara dentro del backend, solo se enviara la fecha
+    //nro semana dentro del año y numero de dia dentro de la semana
     const {nrosemana, nrodia, observacion, productos} = menu;
     let t;
     let item=0;
