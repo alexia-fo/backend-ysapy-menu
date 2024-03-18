@@ -1,5 +1,5 @@
 const {Router} = require('express');
-const {getMenuWeekly, postMenuWeekly, deleteDetailMenu, putDetailMenu, getMenu } = require('../../controllers/admin/menuWeekly');
+const {getMenuWeekly, postMenuWeekly, deleteDetailMenu, putMenu, getMenu } = require('../../controllers/admin/menuWeekly');
 const router = Router();
 
 router.get('/:idcabecera', getMenu);
@@ -10,6 +10,6 @@ router.post('/', postMenuWeekly);
 
 router.delete('/:idDetail', deleteDetailMenu);
 
-router.put('/:idDetail', putDetailMenu);
+router.put('/:idCabecera', putMenu);
 
 module.exports=router;

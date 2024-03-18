@@ -5,7 +5,7 @@ const Producto = require('../../models/producto');
 const moment = require('moment-timezone');
 const zonaHorariaParaguay = 'America/Asuncion';
 
-
+//TODO: EN TORIA YA ESTA FUNCIONANDO
 const getMenu = async(req, res)=>{
     const {idcabecera} = req.params;
 
@@ -49,7 +49,7 @@ const getMenu = async(req, res)=>{
 }
 
 
-//todo: hecho la primera prueba
+//todo: EN TEORIA YA ESTA FUNCIONANDO 
 const getMenuWeekly = async (req, res)=>{
     try {
         const [total, cabeceras] = await Promise.all([
@@ -71,7 +71,7 @@ const getMenuWeekly = async (req, res)=>{
     }
 }
 
-//hecho la primera prueba
+//TODO: EN TEORIA YA ESTA FUNCIONANDO
 const postMenuWeekly = async (req, res)=>{
     const {menu} = req.body;
     //nro semana dentro del año y numero de dia dentro de la semana
@@ -169,7 +169,7 @@ const postMenuWeekly = async (req, res)=>{
     }
 }
 
-//hecho la primera prueba
+//FALTA CORREGIR. NO ESTA DEFINIDO QUE VA  A INCLUIR LA ELIMINACION, BORRAR COMPLETAMENTE O ANULAR
 const deleteDetailMenu = async (req, res)=>{
     const {idDetail} = req.params;
     console.log('Ejecutando Delete');
@@ -195,25 +195,54 @@ const deleteDetailMenu = async (req, res)=>{
     }
 }
 
-const putDetailMenu = async (req, res)=>{
-    const {idproducto, observacion} = req.body;
-    const {idDetail} = req.params;
+//TODO: EN TEORIA YA ESTA FUNCIONANDO
+const putMenu = async (req, res)=>{
+    const {idCabecera} = req.params;
+    const {fecha, observacion, productos} = req.body.menu;
+    let t;
+    try{
+        t=await db.transaction();
 
-    try {
-        const producto = await DMenuSemanal.findByPk(idDetail);
-        
-        producto.update({
-            idproducto,
-            observacion
+        // Elimina los registros de dMenuSemanal
+        await DMenuSemanal.destroy({ where: { idcabeceramenu: idCabecera }, transaction: t });
+
+        // Recorre los productos para insertarlos nuevamente en la tabla dMenuSemanal
+        let item=1;
+        console.log("---------productos",productos)
+        await Promise.all(
+            productos.map(async (producto) => {
+                const { idproducto, observacion } = producto;
+                await DMenuSemanal.create({
+                    idcabeceramenu: idCabecera,
+                    idproducto,
+                    item,
+                    observacion
+                }, { transaction: t });
+
+                item++;
+            })
+        );
+
+        //actualiza la cabecera del menu 
+        //todo: falta validar si existe id de cabecera
+        //en este punto ya debe estar validado
+        const cabeceraMenu = await CMenuSemanal.findByPk(idCabecera);
+
+        await cabeceraMenu.update({fecha, observacion}, {
+            transaction:t
         });
 
+        //confirma la transaccion
+        await t.commit();
+
         res.status(200).json({
-            msg:'Detalle de menú actualizado correctamente'
+            msg: "Datos actualizados correctamente"
         })
-    } catch (e) {
+    }catch(e){
+        console.log(e);
         res.status(500).json({
-            msg:'Error al actualizar los datos del producto',
-            error:e.message
+            msg: 'Error al actualizar el menú',
+            error: e.message
         })
     }
 }
@@ -223,5 +252,5 @@ module.exports={
     getMenuWeekly,
     postMenuWeekly,
     deleteDetailMenu,
-    putDetailMenu
+    putMenu
 }
