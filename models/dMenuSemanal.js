@@ -1,5 +1,6 @@
 const {DataTypes} = require('sequelize');
 const db = require('../db/connection');
+const Producto = require('./producto');
 
 
 const DMenuSemanal = db.define('dmenusemanal', {
@@ -32,6 +33,10 @@ const DMenuSemanal = db.define('dmenusemanal', {
     tableName:'dmenusemanal',
     createdAt: true,
     updatedAt: true
+});
+
+DMenuSemanal.belongsTo(Producto,{
+    foreignKey:'idproducto'
 });
 
 module.exports = DMenuSemanal;

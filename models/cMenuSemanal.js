@@ -7,6 +7,10 @@ const CMenuSemanal = db.define('CMenuSemanal', {
         primaryKey: true,
         unique: true
     },
+    fecha:{
+        type:DataTypes.DATE,
+        allowNull:false
+    },
     nrosemana:{
         type: DataTypes.NUMBER,
         allowNull:false

@@ -2,6 +2,52 @@ const CMenuSemanal = require('../../models/cMenuSemanal');
 const DMenuSemanal = require('../../models/dMenuSemanal');
 const db = require('./../../db/connection');
 const Producto = require('../../models/producto');
+const moment = require('moment-timezone');
+const zonaHorariaParaguay = 'America/Asuncion';
+
+
+const getMenu = async(req, res)=>{
+    const {idcabecera} = req.params;
+
+    try {
+        let [cabecera, productos] = await Promise.all([
+            CMenuSemanal.findByPk(idcabecera,{
+                attributes:['fecha', 'observacion']
+            }),
+            DMenuSemanal.findAll({
+                where:{
+                    idcabeceramenu: idcabecera
+                },
+                include:[
+                    {
+                        model: Producto,
+                        attributes:['nombre']
+                    }
+                ],
+                attributes:['idproducto', 'observacion']
+            })
+        ]);
+
+            // Mapeamos los resultados para ajustar el formato
+            productos = productos.map(detalle => ({
+                idproducto: detalle.idproducto,
+                observacion: detalle.observacion,
+                nombre: detalle.Producto.nombre // Accedemos al nombre del producto
+            }));
+
+        res.status(200).json({
+            ...cabecera.dataValues,
+            productos
+        })
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({
+            msg:'Error durante la obtención del menú',
+            error: e.message
+        })
+    }
+}
+
 
 //todo: hecho la primera prueba
 const getMenuWeekly = async (req, res)=>{
@@ -28,28 +74,41 @@ const getMenuWeekly = async (req, res)=>{
 //hecho la primera prueba
 const postMenuWeekly = async (req, res)=>{
     const {menu} = req.body;
-    //todo:falta modificar el nro de semana y numero de dia se calculara dentro del backend, solo se enviara la fecha
     //nro semana dentro del año y numero de dia dentro de la semana
-    const {nrosemana, nrodia, observacion, productos} = menu;
+    const {fecha, observacion, productos} = menu;
     let t;
     let item=0;
-    let fechaAlta = new Date();
+
+    // Obtener la fecha actual según la zona horaria de Paraguay
+    const fechaActual = moment().tz(zonaHorariaParaguay);
+    const fechaTiempoHoy = fechaActual.format('YYYY-MM-DD HH:mm:ss');
+
+
+    // Convertir la fecha a un objeto moment con la zona horaria especificada
+    // const fechaMoment = moment.tz(fecha, zonaHorariaParaguay);
+
+    // Crear una instancia de moment sin especificar la zona horaria
+    const fechaMoment = moment(fecha);
+
+    // Obtener el número de la semana del año
+    const nrosemana = fechaMoment.isoWeek();
+
+    // Obtener el número de día de la semana (0 para Domingo, 1 para Lunes, ..., 6 para Sábado)
+    const nrodia = fechaMoment.day();
 
     try{
         t = await db.transaction();
 
         console.log('antes de consultar la cabecera')
         await CMenuSemanal.create({
+            fecha: fechaMoment.format('YYYY-MM-DD'),
             nrosemana,
             nrodia,
             observacion,
-            fechaAlta
+            fechaAlta: fechaTiempoHoy
         }, {
             transaction: t
         });
-
-        console.log('despues de consultar la cabecera')
-
 
         let idcabeceramenu = 1;
         let result = await db.query('SELECT LAST_INSERT_ID() as lastId',{
@@ -93,6 +152,7 @@ const postMenuWeekly = async (req, res)=>{
                 msg:'Datos almacenados correctamente'
             })
         }catch(e){
+            console.log(e);
             t.rollback();
             res.status(500).json({
                 msg:`Error durante el proceso. ${e.message}`
@@ -100,6 +160,7 @@ const postMenuWeekly = async (req, res)=>{
       }
 
     }catch(e){
+        console.log(e);
         t.rollback();
         res.status(500).json({
             msg:'Ha ocurrido un error en el servidor durante el almacenamiento del menú',
@@ -158,6 +219,7 @@ const putDetailMenu = async (req, res)=>{
 }
 
 module.exports={
+    getMenu,
     getMenuWeekly,
     postMenuWeekly,
     deleteDetailMenu,
