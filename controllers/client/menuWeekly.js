@@ -32,7 +32,7 @@ const getMenuWeekly = async (req, res)=>{//para listar cabeceras de menu
 const productsMenu = async(req, res)=>{
 
     try {
-        const idCabecera = 38;//debe ser dinamico
+        const idCabecera = 3;//debe ser dinamico
 
         let [cabecera, productos] = await Promise.all([
             //todo: falta tener en cuenta la fecha de los detalles del menu principal, puede ser la fecha del dia
@@ -45,7 +45,7 @@ const productsMenu = async(req, res)=>{
                 include:[
                     {
                         model:Producto,
-                        attributes:['nombre']
+                        attributes:['nombre', 'precio', 'img']
                     }
                 ]
             }),  
@@ -56,6 +56,8 @@ const productsMenu = async(req, res)=>{
                 idproducto: producto.idproducto,
                 item: producto.item,
                 nombre:producto.Producto.nombre,
+                precio:producto.Producto.precio,
+                img:producto.idproducto,
                 observacion: producto.observacion
             }
         });
