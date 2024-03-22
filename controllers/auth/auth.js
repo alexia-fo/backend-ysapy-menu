@@ -1,4 +1,5 @@
 const { generateJWT } = require('../../helpers/generate-jwt');
+const Rol = require('../../models/rol');
 const Usuario = require('./../../models/usuario');
 const bcryptjs = require('bcryptjs');
 
@@ -29,7 +30,7 @@ const login = async (req, res)=>{
          const token = await generateJWT(usuario.idUsuario);
      
          res.status(200).json({
-             token
+            token
          });
     } catch (e) {
         console.log(e);
@@ -47,7 +48,8 @@ const getProfile = async (req, res) => {
   
         const usuario = await Usuario.findAll({
             where:{idUsuario},
-            include: [{ model: Rol, attributes: ['rol']}, { model: Sucursal, attributes: ['nombre']}]
+            attributes:['idUsuario', 'nombre', 'nusuario', 'correo', 'img', 'google', 'idRol'],
+            include: [{ model: Rol, attributes: ['rol']}]
         });
 
             

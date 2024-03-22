@@ -10,6 +10,7 @@ class Server {
         this.port = process.env.PORT;
 
         this.paths={
+            auth:'/auth',
             menuWeeklyAdmin: '/menu/admin/menuWeekly',
             menuWeeklyClient: '/menu/client/menuWeekly',
             productsAdmin: '/menu/admin/products',
@@ -45,8 +46,9 @@ class Server {
 
     routes(){
         console.log('routes')
-        this.app.use(this.paths.menuWeeklyAdmin, require('../routes/admin/menuWeekly'))
-        this.app.use(this.paths.menuWeeklyClient, require('../routes/client/menuWeekly'))
+        this.app.use(this.paths.auth, require('./../routes/auth/auth'));
+        this.app.use(this.paths.menuWeeklyAdmin, require('../routes/admin/menuWeekly'));
+        this.app.use(this.paths.menuWeeklyClient, require('../routes/client/menuWeekly'));
         this.app.use(this.paths.productsAdmin, require('./../routes/admin/products'));
     }
 

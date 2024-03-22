@@ -1,5 +1,6 @@
 const db = require('./../db/connection');
-const { DataTypes } = rquire('sequelize');
+const { DataTypes } = require('sequelize');
+const Rol = require('./rol');
 
 const Usuario = db.define('Usuario', {
     idUsuario: {
@@ -47,6 +48,11 @@ const Usuario = db.define('Usuario', {
     tableName: 'usuarios'
 });
 
+
+Usuario.belongsTo(Rol, {
+    foreignKey: 'idrol'
+});
+    
 module.exports = Usuario;
 
 

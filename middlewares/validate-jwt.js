@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Usuario = require('../models/usuario');
 
-const valdateJWT = async(req, res)=>{
+const valdateJWT = async(req, res, next)=>{
     const token = req.header('x-token');
 
     try {
