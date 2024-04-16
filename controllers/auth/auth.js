@@ -67,8 +67,15 @@ const getProfile = async (req, res) => {
     }
 }
 
+const googleSignIn = async(req, res = response) => {
+    console.log("-------------------------------------")
+    console.log(req.body);
+    res.redirect("http://localhost:4200/profile")
+}
+
 
 module.exports = {
     login,
-    getProfile
+    getProfile,
+    googleSignIn
 }
