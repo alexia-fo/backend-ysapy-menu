@@ -1,4 +1,6 @@
+const { json } = require('sequelize');
 const { generateJWT } = require('../../helpers/generate-jwt');
+const { googleVerify } = require('../../helpers/google-verify');
 const Rol = require('../../models/rol');
 const Usuario = require('./../../models/usuario');
 const bcryptjs = require('bcryptjs');
@@ -68,9 +70,67 @@ const getProfile = async (req, res) => {
 }
 
 const googleSignIn = async(req, res = response) => {
-    console.log("-------------------------------------")
-    console.log(req.body);
-    res.redirect("http://localhost:4200/profile")
+    // console.log("-------------------------------------")
+    // console.log(req.body);
+    // res.redirect("http://localhost:4200/profile")
+
+    //segundo ejemplo
+    const {id_token } = req.body;
+    // console.log(id_token);
+
+    // try {
+
+        const {nombre, img, correo} = await googleVerify(id_token );
+
+        console.log(correo);
+        let usuario = await Usuario.findOne({
+            where:{correo}
+        });
+        console.log(usuario)
+      
+        if(!usuario){
+            //tengo que crearlo
+            const data={
+                nombre,
+                nusuario:'',//add
+                correo,
+                contra:':P',
+                img,
+                google:true,
+                //sucursal, rol, turno add
+                idrol:4//CLIENTE
+            }
+
+            usuario = new Usuario(data);
+
+            await usuario.save();
+        }
+
+        //TODO: falta probar con un usuario anulado
+        //si el usuario esta anulado
+        if(!usuario.activo){
+            res.status(401).json({
+                msg:'Hable con el administrador, usuario bloqueado'
+            })
+        }
+
+        //si no esta anulado genero el jwt
+        //TODO: ver si el id no es null, para volver a consultar si es necesario
+        const token = await generateJWT(usuario.id);
+
+        
+        res.json({
+            msg:'Todo bien',
+            usuario,
+            token
+        })
+    // } catch (error) {
+    //     res.status(400).json({
+    //         ok: false,
+    //         msg:'El token no se pudo verificar'
+    //     })
+    // }
+
 }
 
 

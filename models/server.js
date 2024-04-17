@@ -50,7 +50,7 @@ class Server {
         this.app.use(this.paths.menuWeeklyAdmin, require('../routes/admin/menuWeekly'));
         this.app.use(this.paths.menuWeeklyClient, require('../routes/client/menuWeekly'));
         this.app.use(this.paths.productsAdmin, require('./../routes/admin/products'));
-        this.app.use(this.paths.upload, require('./../routes/uploads/uploads'));
+        // this.app.use(this.paths.upload, require('./../routes/uploads/uploads'));
     }
 
     pages(){//FIXME: PARA JS

@@ -33,13 +33,13 @@ const Usuario = db.define('Usuario', {
         type: DataTypes.BOOLEAN, defaultValue: false
     },
     idsucursal: {
-        type: DataTypes.INTEGER, allowNull: false
+        type: DataTypes.INTEGER, allowNull: true
     },
     idrol: {
         type: DataTypes.INTEGER, allowNull: false
     },
     turno: {
-        type: DataTypes.CHAR(1), allowNull: false
+        type: DataTypes.CHAR(1), allowNull: true
     },
     categoria: {
         type: DataTypes.CHAR(2), allowNull: true

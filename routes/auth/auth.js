@@ -9,6 +9,6 @@ router.get('/getProfile', [
     valdateJWT
 ],getProfile);
 
-router.post('/google', googleSignIn);
+router.post('/google', googleSignIn);//TODO: EL id_token debe ser obligatorio
 
 module.exports = router;
